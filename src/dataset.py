@@ -18,7 +18,7 @@ def load_and_tokenize_train_val(
         "train": train_csv_path,
         "validation": val_csv_path
     }
-    dataset = load_dataset("csv", data_files=data_files)
+    dataset: DatasetDict = load_dataset("csv", data_files=data_files)
 
     # Tokenization function
     def tokenize_fn(example):

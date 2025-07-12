@@ -1,5 +1,4 @@
 from transformers import (
-    BertTokenizer,
     BertForSequenceClassification,
     Trainer,
     TrainingArguments
@@ -38,7 +37,7 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
     metric_for_best_model="accuracy"
 )
-
+ 
 def compute_metrics(pred):
     labels = pred.label_ids
     preds = np.argmax(pred.predictions, axis=1)
