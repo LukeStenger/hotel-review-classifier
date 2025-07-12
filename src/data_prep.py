@@ -56,3 +56,32 @@ def save_splits(train_df, val_df, output_dir):
     train_df.to_csv(os.path.join(output_dir, 'train.csv'), index=False)
     val_df.to_csv(os.path.join(output_dir, 'val.csv'), index=False)
     print(f"Saved train.csv and val.csv to {output_dir}")
+
+
+
+if __name__ == "__main__":
+    INPUT_PATH = 'data/raw/tripadvisor_hotel_reviews.csv'
+    OUTPUT_DIR = 'data/processed/'
+
+    print("[INFO] Loading data...")
+    df = load_data(INPUT_PATH)
+
+    print("[INFO] Removing neutral reviews...")
+    df = remove_neutral_reviews(df)
+
+    print("[INFO] Mapping ratings to binary labels...")
+    df = map_ratings_to_binary_labels(df)
+
+    print("[INFO] Cleaning text...")
+    df = clean_text(df)
+
+    print("[INFO] Dropping empty reviews...")
+    df = drop_empty_reviews(df)
+
+    print("[INFO] Splitting into train/val...")
+    train_df, val_df = split_train_val(df)
+
+    print("[INFO] Saving splits...")
+    save_splits(train_df, val_df, OUTPUT_DIR)
+
+    print("[SUCCESS] Data prep complete!")

@@ -1,43 +1,62 @@
 from transformers import (
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
+    BertTokenizer,
+    BertForSequenceClassification,
     Trainer,
     TrainingArguments
 )
+from tokenizer_utils import get_tokenizer
+from dataset import load_and_tokenize_train_val
 
-MODEL_NAME = 'bert-base-uncased'
-NUM_LABELS = 2
-OUTPUT_DIR = './outputs'
+import numpy as np
+from sklearn.metrics import accuracy_score, f1_score
 
-# Load tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer = get_tokenizer()
 
-model = AutoModelForSequenceClassification.from_pretrained(
-    MODEL_NAME,
-    num_labels=NUM_LABELS
+dataset = load_and_tokenize_train_val(
+    train_csv_path='data/processed/train.csv',
+    val_csv_path='data/processed/val.csv',
+    tokenizer=tokenizer
 )
 
-# Placeholder for data loading
-def load_data():
-    return None, None
+train_dataset = dataset["train"]
+eval_dataset = dataset["validation"]
 
-train_data, val_data = load_data()
+model = BertForSequenceClassification.from_pretrained(
+    'bert-base-uncased',
+    num_labels=2
+)
 
-# MINIMAL, VERSION-SAFE TrainingArguments
 training_args = TrainingArguments(
-    output_dir=OUTPUT_DIR,
-    num_train_epochs=1,
-    per_device_train_batch_size=8
+    output_dir='./outputs',
+    num_train_epochs=3,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    evaluation_strategy="epoch",
+    save_strategy="epoch",
+    logging_dir='./outputs/logs',
+    logging_steps=10,
+    load_best_model_at_end=True,
+    metric_for_best_model="accuracy"
 )
 
-# Define Trainer
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = np.argmax(pred.predictions, axis=1)
+    acc = accuracy_score(labels, preds)
+    f1 = f1_score(labels, preds)
+    return {
+        'accuracy': acc,
+        'f1': f1
+    }
+
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=train_data,
-    eval_dataset=val_data,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics,
+    tokenizer=tokenizer
 )
 
-if __name__ == "__main__":
-    print("✅ Trainer is ready to go!")
-    print(trainer)
+trainer.train()
+
