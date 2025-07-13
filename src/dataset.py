@@ -35,7 +35,7 @@ def load_and_tokenize_train_val(
     # Rename label column
     tokenized_dataset = tokenized_dataset.rename_column(label_column, "labels")
 
-    # Whenever someone fetches an item, convert it to pytorch tensors
+    # Whenever an item is fetched, convert it to pytorch tensors
     tokenized_dataset.set_format(
         type="torch",
         columns=["input_ids", "attention_mask", "labels"]
