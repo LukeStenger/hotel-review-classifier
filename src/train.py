@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
 
 tokenizer = get_tokenizer()
-
+# Get tokenized dataset
 dataset = load_and_tokenize_train_val(
     train_csv_path='data/processed/train.csv',
     val_csv_path='data/processed/val.csv',
