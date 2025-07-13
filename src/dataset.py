@@ -18,7 +18,7 @@ def load_and_tokenize_train_val(
         "train": train_csv_path,
         "validation": val_csv_path
     }
-    dataset = load_dataset("csv", data_files=data_files)
+    dataset: DatasetDict = load_dataset("csv", data_files=data_files)
 
     # Tokenization function
     def tokenize_fn(example):
@@ -35,7 +35,7 @@ def load_and_tokenize_train_val(
     # Rename label column
     tokenized_dataset = tokenized_dataset.rename_column(label_column, "labels")
 
-    # Set PyTorch format
+    # Whenever an item is fetched, convert it to pytorch tensors
     tokenized_dataset.set_format(
         type="torch",
         columns=["input_ids", "attention_mask", "labels"]

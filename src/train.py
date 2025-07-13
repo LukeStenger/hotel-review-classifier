@@ -1,5 +1,4 @@
 from transformers import (
-    BertTokenizer,
     BertForSequenceClassification,
     Trainer,
     TrainingArguments
@@ -11,7 +10,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
 
 tokenizer = get_tokenizer()
-
+# Get tokenized dataset
 dataset = load_and_tokenize_train_val(
     train_csv_path='data/processed/train.csv',
     val_csv_path='data/processed/val.csv',
@@ -38,7 +37,7 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
     metric_for_best_model="accuracy"
 )
-
+ 
 def compute_metrics(pred):
     labels = pred.label_ids
     preds = np.argmax(pred.predictions, axis=1)
